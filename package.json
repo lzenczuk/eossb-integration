@@ -1,0 +1,15 @@
+{
+  "name": "eossportbook-integration",
+  "version": "1.0.0",
+  "description": "Integration nodejs app to connect MB with EOS contract",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "lzenczuk",
+  "license": "MIT",
+  "dependencies": {
+    "eosjs": "^15.0.3",
+    "request": "^2.87.0"
+  }
+}
