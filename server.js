@@ -66,34 +66,109 @@ function downloadsEvents(){
         console.log(eventsToImport);
         console.log(runnersToImport);
 
-        update_events(eventsToImport);
+        //update_events(eventsToImport);
     });
 }
 
 function update_events(eventsList){
 
+    console.log("WARNING! Remember to replace 'keyProvider' with correct key");
+    
     eos = Eos({
         'httpEndpoint': 'http://jungle.cryptolions.io:38888',
         'chainId': '038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca',
         'keyProvider': '5KWwWKRnS3whHbsCgYwi9nmt4FKdNe4PeLewB9cfhh3v3nN8DAK'
     });
 
-    eos.getBlock(1, (error, result) => {
-        if(error) {return console.log(error)}
+    // Getting data from tables
+    
+    eos.getTableRows({'code':'mbesbs1cont1','scope':'mbesbs1cont1', 'table':'offer', 'json': true}).then(function(response){
+        console.log(JSON.stringify(response))
+    });
 
-        console.log(JSON.stringify(result));
-        console.log(eventsList.length);
-    })
+    eos.getTableRows({'code':'mbesbs1cont1','scope':'mbesbs1cont1', 'table':'runner', 'json': true}).then(function(response){
+        console.log(JSON.stringify(response))
+    });
+
+    eos.getTableRows({'code':'mbesbs1cont1','scope':'mbesbs1cont1', 'table':'event', 'json': true}).then(function(response){
+        console.log(JSON.stringify(response))
+    });
+
+    // Calling actions
+    
+    /*eos.transaction(
+        {
+            actions: [
+                {
+                    account: 'mbesbs1cont1',
+                    name: 'updoffers',
+                    authorization: [{
+                        actor: 'mbesbs1cont1',
+                        permission: 'active'
+                    }],
+                    data: {
+                        "offers_to_update": [{"runner_id": 2, "price": 4.25, "max_amount": 130}, {"runner_id": 1, "price": 2.11, "max_amount": 98}, {"runner_id": 3, "price": 3.54, "max_amount": 1223}, {"runner_id": 4, "price": 1.89, "max_amount": 215}, {"runner_id": 5, "price": 2.12, "max_amount": 755}, {"runner_id": 6, "price": 8.11, "max_amount": 424}, {"runner_id": 7, "price": 3.0, "max_amount": 1505}, {"runner_id": 8, "price": 3.77, "max_amount": 334}]
+                    }
+                }
+            ]
+        }
+    ).then(function(result){
+        console.log(result)
+    })*/
+
+    /*eos.transaction(
+        {
+            actions: [
+                {
+                    account: 'mbesbs1cont1',
+                    name: 'updrunners',
+                    authorization: [{
+                        actor: 'mbesbs1cont1',
+                        permission: 'active'
+                    }],
+                    data: {
+                        "runners_to_update": [{"runner_id": 1, "event_id": 1, "runner_name": "test1"}]
+                    }
+                }
+            ]
+        }
+    ).then(function(result){
+        console.log(result)
+    })*/
+
+    /*eos.transaction(
+        {
+            actions: [
+                {
+                    account: 'mbesbs1cont1',
+                    name: 'updevents',
+                    authorization: [{
+                        actor: 'mbesbs1cont1',
+                        permission: 'active'
+                    }],
+                    data: {
+                        "events_to_update": [{"event_id": 1, "event_name": "test 1"}, {"event_id":2, "event_name":"test 2"}]
+                    }
+                }
+            ]
+        }
+    ).then(function(result){
+        console.log(result)
+    })*/
 
 }
 
 function mainLoop(){
     console.log("-------------> loop");
-    downloadsEvents();
-    setTimeout(mainLoop, 10000)
+    //downloadsEvents();
+    //setTimeout(mainLoop, 10000)
+
+    update_events()
 }
 
 
 console.log("-----------> hello");
 setTimeout(mainLoop, 0);
+
+
 
