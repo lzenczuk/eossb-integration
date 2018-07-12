@@ -1,13 +1,13 @@
-### Usage
+# Usage
 
 ## Server
 
-# Start
+### Start
 ```
 node server.js
 ```
 
-# Endpoints
+### Endpoints
 
 POST http://localhost:8081/accept_offer
 ```
