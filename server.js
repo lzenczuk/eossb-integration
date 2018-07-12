@@ -1,21 +1,18 @@
-const request = require('request');
 const Eos = require('eosjs');
+const express = require('express');
+const bodyParser = require('body-parser');
 
 // ----------------------------------
 
 const network_address = 'http://jungle.cryptolions.io:38888';
 const betting_contract = 'esbcontrac1';
 const house_account = 'house1';
-const house_account_private_key = '----REPLACE_WITH_HOUSE_ACCOUNT_PRIVATE_KEY-----';
+//const house_account_private_key = '----REPLACE_WITH_HOUSE_ACCOUNT_PRIVATE_KEY-----';
 
 // ----------------------------------
 
-function create_bet_on_matchbook(price, amount_eos){
-    console.log("Create MB offer. Price: "+price+"; EOS: "+amount_eos);
-    return 880000+Math.random() * (10000 - 0);
-}
 
-function accept_transaction(offer_id, mb_offer_id, amount_eos){
+function accept_offer(offer_id, mb_offer_id, amount_eos, res){
 
     eos = Eos({
         'httpEndpoint': network_address,
@@ -24,59 +21,45 @@ function accept_transaction(offer_id, mb_offer_id, amount_eos){
     });
 
     eos.transfer({from: house_account, to: betting_contract, quantity: (amount_eos.toFixed(4))+" EOS", memo: 'ao:'+offer_id+':'+mb_offer_id}, (error, result) => {
-        console.log("Error: "+JSON.stringify(error));
-        console.log("Result: "+JSON.stringify(result));
+
+        if(result===undefined){
+            res.status(500).json(error)
+        }else{
+            res.status(200).json(result)
+        }
     })
 }
 
+const app = express();
 
-function offers_processor(){
+app.use(bodyParser.json());
 
-    eos = Eos({
-        'httpEndpoint': network_address,
-        'chainId': '038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca'
-    });
+app.post('/accept_offer', function (req, res) {
 
-    // Getting offers
+    if(req.body.offer_id===undefined){
+        res.status(400).send('Missing offer_id,');
+        return;
+    }
 
-    eos.getTableRows({'code':betting_contract,'scope':betting_contract, 'table':'offers', 'json': true}).then(function(response){
+    if(req.body.mb_offer_id===undefined){
+        res.status(400).send('Missing mb_offer_id,');
+        return;
+    }
 
-        for(var i=0;i<response['rows'].length;i++){
-            let offer = response['rows'][i];
+    if(req.body.amount_eos===undefined){
+        res.status(400).send('Missing amount_eos.');
+        return;
+    }
 
-            if(offer['status']===0){
+    accept_offer(req.body.offer_id, req.body.mb_offer_id, req.body.amount_eos, res);
+});
 
-                console.log("Offer "+offer['offer_id']+" waiting for matching");
-                mb_offer_id = create_bet_on_matchbook(offer['price'], offer['amount']);
+const server = app.listen(8081, function () {
 
-                // calculate
-                let eos_amount = ((offer['price']-1.0)*offer['amount'])/10000.0;
+    let host = server.address().address;
+    let port = server.address().port;
 
-                console.log("Eos amount to create lay bet "+eos_amount);
-                accept_transaction(offer['offer_id'], mb_offer_id, eos_amount)
+    console.log("Example app listening at http://%s:%s", host, port)
 
-            }else{
-                console.log("Offer "+offer['offer_id']+" matched")
-            }
-        }
-    });
-
-
-}
-
-function mainLoop(){
-    console.log("-------------> loop");
-    //downloadsEvents();
-    //setTimeout(mainLoop, 10000)
-
-    update_events()
-}
-
-
-//console.log("-----------> hello");
-//setTimeout(mainLoop, 0);
-
-offers_processor()
-
-
+});
 
