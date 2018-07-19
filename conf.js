@@ -1,6 +1,6 @@
 module.exports = {
     account: {
-        betting_contract: 'esbcontrac1',
+        betting_contract: 'esbcontrac2',
         house_account: 'house1',
         user1: 'user1',
         user2: 'user2',
